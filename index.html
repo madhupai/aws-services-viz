@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AWS Services Announcements Tree</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        
+        #visualization {
+            width: 100%;
+            height: 1200px;
+            overflow: auto;
+        }
+
+        .node circle {
+            fill: #fff;
+            stroke-width: 3px;
+        }
+
+        .node text {
+            font: 14px sans-serif;
+            fill: #fff;
+        }
+
+        .node a {
+            fill: #66b3ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .node a:hover {
+            fill: #99ccff;
+        }
+
+        .link {
+            fill: none;
+            stroke: #666;
+            stroke-width: 2px;
+        }
+
+        .count-badge {
+            fill: #ff4444;
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            max-width: 300px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>AWS Services Announcements</h1>
+    <div id="visualization"></div>
+
+    <script>
+    // Add your data constant here
+
+const data = {
+  name: "AWS Services",
+  children: [
+    {
+      name: "Analytics",
+      children: [
+        {
+          name: "Data Analysis",
+          children: [
+            {
+              name: "Announcing scenarios analysis capability of Amazon Q in QuickSight (preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/scenario-analysis-capability-amazon-q-quicksight-preview/"
+            },
+            {
+              name: "Announcing Amazon S3 Metadata (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-s3-metadata-preview/"
+            },
+            {
+              name: "Amazon Q in QuickSight unifies insights from structured and unstructured data",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-quicksight-insights-structured-unstructured-data/"
+            },
+            {
+              name: "Amazon Q Business now provides insights from your databases and data warehouses (preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-business-insights-databases-data-warehouses-preview"
+            }
+          ]
+        },
+        {
+          name: "Data Integration",
+          children: [
+            {
+              name: "Amazon DynamoDB zero-ETL integration with Amazon SageMaker Lakehouse",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-dynamo-db-zero-etl-integration-sagemaker-lakehouse"
+            },
+            {
+              name: "AWS expands data connectivity for Amazon SageMaker Lakehouse and AWS Glue",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-expands-data-connectivity-amazon-sagemaker-lakehouse-glue"
+            },
+            {
+              name: "Amazon S3 Access Grants now integrate with AWS Glue",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-s3-access-grants-integrate-glue/"
+            },
+            {
+              name: "Amazon OpenSearch Service zero-ETL integration with Amazon Security Lake",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-opensearch-service-zero-etl-integration-security-lake"
+            }
+          ]
+        },
+        {
+          name: "SageMaker & AI",
+          children: [
+            {
+              name: "Amazon SageMaker Lakehouse integrated access controls now available in Amazon Athena federated queries",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-sagemaker-lakehouse-integrated-access-controls-athena-federated-queries"
+            },
+            {
+              name: "Introducing AWS Glue 5.0",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-glue-5-0/"
+            },
+            {
+              name: "Introducing the next generation of Amazon SageMaker",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/next-generation-amazon-sagemaker"
+            },
+            {
+              name: "AWS announces Amazon SageMaker Lakehouse",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-announces-amazon-sagemaker-lakehouse"
+            }
+          ]
+        },
+        {
+          name: "Data Governance",
+          children: [
+            {
+              name: "AWS Clean Rooms now supports multiple clouds and data sources",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-clean-rooms-multiple-clouds-data-sources/"
+            },
+            {
+              name: "Introducing Amazon SageMaker Data and AI Governance",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-sagemaker-data-ai-governance/"
+            },
+            {
+              name: "Data Lineage is now generally available in Amazon DataZone",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/data-lineage-amazon-datazone-next-generation-sagemaker/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Application Integration",
+      children: [
+        {
+          name: "Services",
+          children: [
+            {
+              name: "Amazon Bedrock now supports multi-agent collaboration",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-multi-agent-collaboration/"
+            },
+            {
+              name: "Amazon EventBridge and AWS Step Functions announce integration with private APIs",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-eventbridge-step-functions-integration-private-apis/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Business Applications",
+      children: [
+        {
+          name: "Amazon Connect",
+          children: [
+            {
+              name: "Amazon Connect Contact Lens now supports external voice",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-contact-lens-external-voice"
+            },
+            {
+              name: "Amazon Connect now supports external voice transfers",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-external-voice-transfers"
+            },
+            {
+              name: "Amazon Connect Contact Lens now automatically categorizes your contacts using generative AI",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-contact-lens-categorizes-contacts-generative-ai"
+            },
+            {
+              name: "Amazon Connect launches AI guardrails for Amazon Q in Connect",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-ai-guardrails-q-connect"
+            },
+            {
+              name: "Amazon Connect launches new intraday forecast dashboards",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-launches-intraday-forecast-dashboards"
+            }
+          ]
+        },
+        {
+          name: "Communications",
+          children: [
+            {
+              name: "Amazon Connect launches AI assistant for customer segments and trigger-based campaigns",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-ai-assistant-customer-segments-trigger-based-campaigns"
+            },
+            {
+              name: "Amazon Connect now supports WhatsApp Business messaging",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-connect-whatsapp-business-messaging"
+            }
+          ]
+        },
+        {
+          name: "Integration",
+          children: [
+            {
+              name: "AWS announces Salesforce Contact Center with Amazon Connect (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/salesforce-contact-center-amazon-connect-preview"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Compute",
+      children: [
+        {
+          name: "EC2",
+          children: [
+            {
+              name: "Amazon EC2 Trn2 instances are generally available",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-ec2-trn2-instances-available/"
+            },
+            {
+              name: "Amazon EC2 P5en instances optimized for generative AI and HPC",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-ec2-p5en-instances-generative-ai-hpc-generally-available"
+            },
+            {
+              name: "Announcing Amazon EC2 I8g instances",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-ec2-i8g-instances"
+            },
+            {
+              name: "Introducing Amazon EC2 next generation high density Storage Optimized I7ie instances",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-ec2-next-generation-high-density-storage-optimized-i7ie-instances"
+            }
+          ]
+        },
+        {
+          name: "Containers & VMware",
+          children: [
+            {
+              name: "Announcing Amazon Elastic VMware Service (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-elastic-vmware-service-preview/"
+            },
+            {
+              name: "Deploy GROW with SAP on AWS from AWS Marketplace",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/deploy-grow-sap-aws-marketplace/"
+            },
+            {
+              name: "Announcing Amazon EKS Auto Mode",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-eks-auto-mode/"
+            },
+            {
+              name: "Announcing Amazon EKS Hybrid Nodes",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-eks-hybrid-nodes"
+            }
+          ]
+        },
+        {
+          name: "Management & Governance",
+          children: [
+            {
+              name: "Amazon Web Services announces declarative policies",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-declarative-policies"
+            },
+            {
+              name: "Amazon CloudWatch Container Insights launches enhanced observability for Amazon ECS",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-cloudwatch-container-insights-observability-ecs/"
+            },
+            {
+              name: "AWS Marketplace now offers EC2 Image Builder components from independent software vendors",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-marketplace-ec2-image-builder-components-software-vendors/"
+            },
+            {
+              name: "Amazon EC2 introduces Allowed AMIs to enhance AMI governance",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-ec2-allowed-amis-enhance-ami-governance"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Containers",
+      children: [
+        {
+          name: "Networking",
+          children: [
+            {
+              name: "VPC Lattice now includes TCP support with VPC Resources",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/vpc-lattice-tcp-vpc-resources"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Customer Engagement",
+      children: [
+        {
+          name: "Monitoring & Observability",
+          children: [
+            {
+              name: "Amazon CloudWatch and Amazon OpenSearch Service launch an integrated analytics experience",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-cloudwatch-opensearch-service-integrated-analytics/"
+            },
+            {
+              name: "Amazon CloudWatch adds network performance monitoring for AWS workloads using flow monitors",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-cloudwatch-network-monitoring-workloads-monitors/"
+            },
+            {
+              name: "AWS Control Tower launches managed controls using declarative policies",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-control-tower-managed-controls-declarative-policies"
+            },
+            {
+              name: "AWS announces Amazon CloudWatch Database Insights",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-cloudwatch-database-insights/"
+            }
+          ]
+        },
+        {
+          name: "Digital Sovereignty",
+          children: [
+            {
+              name: "Introducing the AWS Digital Sovereignty Competency",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-digital-sovereignty-competency"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Databases",
+      children: [
+        {
+          name: "Aurora & DynamoDB",
+          children: [
+            {
+              name: "Announcing Amazon Aurora DSQL (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-aurora-dsql-preview/"
+            },
+            {
+              name: "Amazon DynamoDB global tables previews multi-Region strong consistency",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-dynamodb-global-tables-previews-multi-region-strong-consistency/"
+            }
+          ]
+        },
+        {
+          name: "Migration & Integration",
+          children: [
+            {
+              name: "AWS DMS Schema Conversion now uses generative AI",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-dms-schema-conversion-generative-ai/"
+            },
+            {
+              name: "Announcing the general availability of Amazon MemoryDB Multi-Region",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/general-availability-amazon-memory-db-multi-region/"
+            },
+            {
+              name: "Oracle Database@AWS is now in limited preview",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/oracle-database-aws-limited-preview/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Developer Tools",
+      children: [
+        {
+          name: "Amazon Q Developer",
+          children: [
+            {
+              name: "Amazon Q Developer now provides transformation capabilities for .NET porting (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-developer-transformation-net-porting-preview/"
+            },
+            {
+              name: "Amazon Q Developer can now generate documentation within your source code",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-developer-generate-documentation-source-code/"
+            },
+            {
+              name: "Amazon Q Developer transformation capabilities for mainframe modernization are now available (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-developer-transformation-mainframe-modernization/"
+            }
+          ]
+        },
+        {
+          name: "Integration",
+          children: [
+            {
+              name: "Announcing GitLab Duo with Amazon Q (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/gitlab-duo-amazon-q-preview"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Front End Web & Mobile",
+      children: [
+        {
+          name: "Storage",
+          children: [
+            {
+              name: "Storage Browser for Amazon S3 is now generally available",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/storage-browser-amazon-s3/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Machine Learning",
+      children: [
+        {
+          name: "Amazon Bedrock",
+          children: [
+            {
+              name: "Amazon Bedrock Knowledge Bases now supports structured data retrieval",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-knowledge-bases-structured-data-retrieval"
+            },
+            {
+              name: "Amazon Bedrock Knowledge Bases now supports GraphRAG (preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-knowledge-bases-graphrag-preview"
+            },
+            {
+              name: "Amazon Bedrock Data Automation now available in preview",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-data-automation-available-preview"
+            },
+            {
+              name: "Amazon Bedrock Knowledge Bases now processes multimodal data",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-knowledge-bases-processes-multimodal-data"
+            },
+            {
+              name: "Amazon Bedrock Model Distillation is now available in preview",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-model-distillation-preview/"
+            }
+          ]
+        },
+        {
+          name: "SageMaker",
+          children: [
+            {
+              name: "Task governance is now generally available for Amazon SageMaker HyperPod",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/task-governance-amazon-sagemaker-hyperpod/"
+            },
+            {
+              name: "AWS announces Amazon SageMaker Partner AI Apps",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-sagemaker-partner-ai-apps/"
+            },
+            {
+              name: "Announcing Amazon SageMaker HyperPod recipes",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-sagemaker-hyperpod-recipes/"
+            },
+            {
+              name: "Amazon SageMaker HyperPod now provides flexible training plans",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-sagemaker-hyperpod-flexible-training-plans/"
+            }
+          ]
+        },
+        {
+          name: "Amazon Q",
+          children: [
+            {
+              name: "Announcing GenAI Index in Amazon Kendra",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/genai-index-amazon-kendra/"
+            },
+            {
+              name: "Amazon Q Developer adds operational investigation capability (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-developer-operational-investigation-preview/"
+            },
+            {
+              name: "Amazon Q Developer can now automate code reviews",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-developer-automate-code-reviews/"
+            },
+            {
+              name: "Amazon Q Business introduces over 50 actions for popular business applications and platforms",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-q-business-50-actions-business-applications-platforms"
+            }
+          ]
+        },
+        {
+          name: "Guardrails & Security",
+          children: [
+            {
+              name: "Amazon Bedrock Guardrails supports multimodal toxicity detection for image content (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-guardrails-multimodal-toxicity-detection-image-content-preview"
+            },
+            {
+              name: "Announcing new AWS AI Service Cards to advance responsible generative AI",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-ai-service-cards-advance-responsible-generative-ai/"
+            },
+            {
+              name: "Amazon Bedrock Guardrails now supports Automated Reasoning checks (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-guardrails-automated-reasoning-checks-preview"
+            }
+          ]
+        },
+        {
+          name: "Foundation Models",
+          children: [
+            {
+              name: "Amazon Bedrock Marketplace brings over 100 models to Amazon Bedrock",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-marketplace-100-models-bedrock/"
+            },
+            {
+              name: "Announcing Amazon Bedrock IDE in preview as part of Amazon SageMaker Unified Studio",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-ide-preview-sagemaker-unified-studio/"
+            },
+            {
+              name: "Announcing Amazon Nova foundation models available today in Amazon Bedrock",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-nova-foundation-models-bedrock"
+            }
+          ]
+        },
+        {
+          name: "Knowledge Bases",
+          children: [
+            {
+              name: "Amazon Bedrock Knowledge Bases now supports RAG evaluation (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-knowledge-bases-rag-evaluation-preview/"
+            },
+            {
+              name: "Amazon Bedrock Model Evaluation now includes LLM-as-a-judge (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-model-evaluation-llm-as-a-judge-preview"
+            },
+            {
+              name: "Amazon Bedrock Knowledge Bases now provides auto-generated query filters for improved retrieval",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-bedrock-knowledge-bases-auto-generated-query-filters-improved-retrieval"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Migration and Transfer",
+      children: [
+        {
+          name: "Transfer Family",
+          children: [
+            {
+              name: "Announcing AWS Transfer Family web apps",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-transfer-family-web-apps/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Networking & Content Delivery",
+      children: [
+        {
+          name: "VPC & PrivateLink",
+          children: [
+            {
+              name: "AWS announces access to VPC resources over AWS PrivateLink",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/access-vpc-resources-aws-privatelink/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Partner",
+      children: [
+        {
+          name: "Integration",
+          children: [
+            {
+              name: "Buy with AWS accelerates solution discovery and procurement on AWS Partner websites",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/buy-aws-software-discovery-procurement-partner-websites/"
+            },
+            {
+              name: "New streamlined deployment experience for Databricks on AWS",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/streamlined-deployment-experience-databricks-aws"
+            }
+          ]
+        },
+        {
+          name: "Security",
+          children: [
+            {
+              name: "Respond and recovery more quickly with AWS Security Incident Response Partners",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/respond-recovery-aws-security-incident-response-partners"
+            }
+          ]
+        },
+        {
+          name: "Collaboration",
+          children: [
+            {
+              name: "Start collaborating on multi-partner opportunities with Partner Connections (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/collaborating-multi-partner-opportunities-partner-connections-preview"
+            },
+            {
+              name: "Introducing the AWS Consumer Goods Competency",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-consumer-goods-competency"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Security, Identity & Compliance",
+      children: [
+        {
+          name: "Security Services",
+          children: [
+            {
+              name: "AWS announces AWS Security Incident Response for general availability",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-security-incident-response/"
+            },
+            {
+              name: "Introducing the Amazon Security Lake Ready Specialization",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-security-lake-ready-specialization/"
+            },
+            {
+              name: "AWS Security Competency Update: New AI Security Category",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-security-competency-update-ai-security-category/"
+            }
+          ]
+        },
+        {
+          name: "Access & Verification",
+          children: [
+            {
+              name: "AWS Verified Access now supports secure access to resources over non-HTTP(S) protocols (Preview)",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/aws-verified-access-secure-access-resources-non-https-protocols-preview"
+            },
+            {
+              name: "Amazon GuardDuty introduces GuardDuty Extended Threat Detection",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-guardduty-extended-threat-detection/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Storage",
+      children: [
+        {
+          name: "S3",
+          children: [
+            {
+              name: "Announcing Amazon S3 Tables – Fully managed Apache Iceberg tables optimized for analytics workloads",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-s3-tables-apache-iceberg-tables-analytics-workloads/"
+            },
+            {
+              name: "Amazon S3 adds new default data integrity protections",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-s3-default-data-integrity-protections/"
+            },
+            {
+              name: "Amazon S3 launches storage classes for AWS Dedicated Local Zones",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-s3-storage-classes-dedicated-local-zones/"
+            }
+          ]
+        },
+        {
+          name: "FSx",
+          children: [
+            {
+              name: "Announcing Amazon FSx Intelligent-Tiering, a new storage class for FSx",
+              url: "https://aws.amazon.com/about-aws/whats-new/2024/12/amazon-fsx-intelligent-tiering-storage-class-fsx/"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+
+    
+    // Set up the visualization with increased spacing
+    const margin = {top: 20, right: 120, bottom: 20, left: 180};
+    const width = 2000 - margin.right - margin.left;
+    const height = 1100 - margin.top - margin.bottom;
+
+    // Create the SVG container
+    const svg = d3.select("#visualization")
+        .append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Create tooltip
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    // Define color scale with brighter colors
+    const colorScale = d3.scaleOrdinal()
+        .range(['#00bfff', '#00ff00', '#ff1493', '#ffa500', '#9370db']);
+
+    // Create the tree layout with increased vertical spacing
+    const treemap = d3.tree().size([height, width])
+        .separation((a, b) => (a.parent == b.parent ? 2 : 2.5));
+
+    // Create the root node
+    const root = d3.hierarchy(data, d => d.children);
+    root.x0 = height / 2;
+    root.y0 = 0;
+
+    // Calculate max announcements for circle scaling
+    function getMaxAnnouncements(node) {
+        if (!node.children && !node._children) return 1;
+        let max = countLeafNodes(node);
+        if (node.children) {
+            node.children.forEach(child => {
+                max = Math.max(max, getMaxAnnouncements(child));
+            });
+        }
+        if (node._children) {
+            node._children.forEach(child => {
+                max = Math.max(max, getMaxAnnouncements(child));
+            });
+        }
+        return max;
+    }
+
+    const maxAnnouncements = getMaxAnnouncements(root);
+    const radiusScale = d3.scaleLinear()
+        .domain([1, maxAnnouncements])
+        .range([5, 20]);
+
+    // Collapse all nodes initially
+    function collapse(d) {
+        if (d.children) {
+            d._children = d.children;
+            d._children.forEach(collapse);
+            d.children = null;
+        }
+    }
+
+    root.children.forEach(collapse);
+
+    let i = 0;
+
+    function update(source) {
+        const treeData = treemap(root);
+        const nodes = treeData.descendants();
+        const links = treeData.descendants().slice(1);
+
+        // Normalize for fixed-depth with increased spacing
+        nodes.forEach(d => d.y = d.depth * 280);
+
+        // Update the nodes
+        const node = svg.selectAll('g.node')
+            .data(nodes, d => d.id || (d.id = ++i));
+
+        const nodeEnter = node.enter().append('g')
+            .attr('class', 'node')
+            .attr("transform", d => `translate(${source.y0},${source.x0})`)
+            .on('click', (event, d) => {
+                if (!d.data.url) {  // Only toggle if it's not a leaf node
+                    if (d.children) {
+                        d._children = d.children;
+                        d.children = null;
+                    } else {
+                        d.children = d._children;
+                        d._children = null;
+                    }
+                    update(d);
+                }
+            });
+
+        // Add Circle for the nodes with dynamic sizing
+        nodeEnter.append('circle')
+            .attr('r', d => radiusScale(countLeafNodes(d)))
+            .style("fill", d => d._children ? colorScale(d.depth) : "#fff")
+            .style("stroke", d => colorScale(d.depth));
+
+        // Add labels for the nodes
+        nodeEnter.append('text')
+            .attr("dy", d => ".35em")
+            .attr("x", d => {
+                const radius = radiusScale(countLeafNodes(d));
+                return d.children || d._children ? -(radius + 10) : (radius + 10);
+            })
+            .attr("text-anchor", d => d.children || d._children ? "end" : "start")
+            .each(function(d) {
+                if (d.data.url) {
+                    // Create clickable link for leaves
+                    d3.select(this)
+                        .append("a")
+                        .attr("xlink:href", d.data.url)
+                        .attr("target", "_blank")
+                        .text(d.data.name);
+                } else {
+                    // Regular text for non-leaves
+                    d3.select(this).text(d.data.name);
+                }
+            });
+
+        // Add count badges
+        nodeEnter.append('text')
+            .attr('class', 'count-badge')
+            .attr("dy", d => {
+                const radius = radiusScale(countLeafNodes(d));
+                return -radius - 5;
+            })
+            .attr("x", d => {
+                const radius = radiusScale(countLeafNodes(d));
+                return -(radius + 5);
+            })
+            .attr("text-anchor", "end")
+            .text(d => {
+                if (d.children || d._children) {
+                    const count = countLeafNodes(d);
+                    return count > 0 ? count : '';
+                }
+                return '';
+            });
+
+        // Update
+        const nodeUpdate = nodeEnter.merge(node);
+
+        nodeUpdate.transition()
+            .duration(750)
+            .attr("transform", d => `translate(${d.y},${d.x})`);
+
+        nodeUpdate.select('circle')
+            .attr('r', d => radiusScale(countLeafNodes(d)))
+            .style("fill", d => d._children ? colorScale(d.depth) : "#fff")
+            .style("stroke", d => colorScale(d.depth))
+            .attr('cursor', d => d.data.url ? 'pointer' : 'default');
+
+        // Remove exiting nodes
+        const nodeExit = node.exit().transition()
+            .duration(750)
+            .attr("transform", d => `translate(${source.y},${source.x})`)
+            .remove();
+
+        // Update the links
+        const link = svg.selectAll('path.link')
+            .data(links, d => d.id);
+
+        const linkEnter = link.enter().insert('path', "g")
+            .attr("class", "link")
+            .attr('d', d => {
+                const o = {x: source.x0, y: source.y0};
+                return diagonal(o, o);
+            });
+
+        const linkUpdate = linkEnter.merge(link);
+
+        linkUpdate.transition()
+            .duration(750)
+            .attr('d', d => diagonal(d, d.parent));
+
+        link.exit().transition()
+            .duration(750)
+            .attr('d', d => {
+                const o = {x: source.x, y: source.y};
+                return diagonal(o, o);
+            })
+            .remove();
+
+        nodes.forEach(d => {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
+    }
+
+    function countLeafNodes(node) {
+        if (!node.children && !node._children) {
+            return 1;
+        }
+        let count = 0;
+        const children = node.children || node._children;
+        if (children) {
+            children.forEach(child => {
+                count += countLeafNodes(child);
+            });
+        }
+        return count;
+    }
+
+    function diagonal(s, d) {
+        return `M ${s.y} ${s.x}
+                C ${(s.y + d.y) / 2} ${s.x},
+                  ${(s.y + d.y) / 2} ${d.x},
+                  ${d.y} ${d.x}`;
+    }
+
+    update(root);
+
+    </script>
+</body>
+</html>
